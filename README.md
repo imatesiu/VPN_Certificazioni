@@ -23,7 +23,7 @@ La configurazione reale e' gia' in `.env`:
 SERVERURL=sseapid.isti.cnr.it
 SERVERPORT=51820
 PEERS=android1,android2,android3,macos1,windows1,linux1
-PEERDNS=10.8.0.1
+PEERDNS=10.8.0.5
 ```
 
 Sul server esegui prima l'installazione:
@@ -130,10 +130,12 @@ I dispositivi Android collegati alla VPN useranno il DNS indicato da `PEERDNS` i
 La configurazione attuale usa:
 
 ```dotenv
-PEERDNS=10.8.0.1
+PEERDNS=10.8.0.5
 ```
 
-Usa questo valore se il resolver DNS locale gira direttamente su `sseapid.isti.cnr.it` ed e' configurato per ascoltare anche sull'interfaccia WireGuard. Se invece il DNS locale e' su una rete interna, sostituisci il valore con il suo IP, per esempio:
+Usa questo valore se il resolver DNS locale e' raggiungibile dai client VPN all'indirizzo `10.8.0.5`. Con l'ordine peer attuale, `10.8.0.5` e' assegnato a `macos1`, quindi quel peer deve essere il DNS locale oppure va riservato a un servizio DNS dedicato.
+
+Se invece il DNS locale e' su una rete interna, sostituisci il valore con il suo IP, per esempio:
 
 ```dotenv
 PEERDNS=192.168.1.53
