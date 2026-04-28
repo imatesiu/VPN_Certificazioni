@@ -1,0 +1,7 @@
+.DS_Store
+wireguard/config/
+*.key
+*.crt
+*.csr
+*.pem
+*.ovpn
