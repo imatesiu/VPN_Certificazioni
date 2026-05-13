@@ -29,7 +29,7 @@ La configurazione reale e' gia' in `.env`:
 SERVERURL=sseapid.isti.cnr.it
 SERVERPORT=51820
 PEERS=android1,android2,android3,macos1,windows1,linux1
-PEERDNS=10.8.0.5
+PEERDNS=192.168.4.146
 ```
 
 Sul server esegui prima l'installazione:
@@ -173,13 +173,13 @@ openvpn/INSTALL_UBUNTU.md
 OpenVPN usa una rete separata:
 
 ```text
-10.9.0.0/24
+192.168.4.0/24
 ```
 
 Il DNS consegnato ai client OpenVPN e':
 
 ```text
-10.9.0.5
+192.168.4.146
 ```
 
 Questo IP e' riservato al client/servizio `dns1` con `openvpn/ccd/dns1`.
@@ -200,10 +200,10 @@ I dispositivi Android collegati alla VPN useranno il DNS indicato da `PEERDNS` i
 La configurazione attuale usa:
 
 ```dotenv
-PEERDNS=10.8.0.5
+PEERDNS=192.168.4.146
 ```
 
-Usa questo valore se il resolver DNS locale e' raggiungibile dai client VPN all'indirizzo `10.8.0.5`. Con l'ordine peer attuale, `10.8.0.5` e' assegnato a `macos1`, quindi quel peer deve essere il DNS locale oppure va riservato a un servizio DNS dedicato.
+Usa questo valore se il resolver DNS locale e' raggiungibile dai client VPN all'indirizzo `192.168.4.146`. Con l'ordine peer attuale, `192.168.4.146` e' assegnato a `macos1`, quindi quel peer deve essere il DNS locale oppure va riservato a un servizio DNS dedicato.
 
 Se invece il DNS locale e' su una rete interna, sostituisci il valore con il suo IP, per esempio:
 
@@ -222,7 +222,7 @@ Se stai usando split tunnel, l'IP del DNS deve essere incluso in `ALLOWEDIPS`, p
 
 ```dotenv
 PEERDNS=192.168.1.53
-ALLOWEDIPS=10.8.0.0/24,192.168.1.53/32
+ALLOWEDIPS=192.168.4.0/24,192.168.1.53/32
 ```
 
 ## Rotte e accesso
@@ -236,13 +236,13 @@ AllowedIPs = 0.0.0.0/0, ::/0
 Per usare la VPN solo verso la rete VPN, sostituisci `AllowedIPs` con:
 
 ```text
-AllowedIPs = 10.8.0.0/24
+AllowedIPs = 192.168.4.0/24
 ```
 
 Se devi raggiungere reti interne dietro `sseapid.isti.cnr.it`, aggiungi anche quelle subnet, per esempio:
 
 ```text
-AllowedIPs = 10.8.0.0/24, 192.168.1.0/24
+AllowedIPs = 192.168.4.0/24, 192.168.1.0/24
 ```
 
 ## Note sicurezza

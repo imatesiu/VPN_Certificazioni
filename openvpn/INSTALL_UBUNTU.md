@@ -11,16 +11,16 @@ sseapid.isti.cnr.it:1194/udp
 Rete OpenVPN:
 
 ```text
-10.9.0.0/24
+192.168.4.0/24
 ```
 
 DNS consegnato ai client OpenVPN:
 
 ```text
-10.9.0.5
+192.168.4.146
 ```
 
-Il DNS `10.9.0.5` deve essere raggiungibile dai client OpenVPN. In questa configurazione l'indirizzo viene riservato a un client/servizio OpenVPN chiamato `dns1`.
+Il DNS `192.168.4.146` deve essere raggiungibile dai client OpenVPN. In questa configurazione l'indirizzo viene riservato a un client/servizio OpenVPN chiamato `dns1`.
 
 ## Certificato Let's Encrypt
 
@@ -67,7 +67,7 @@ Genera il primo client:
 sudo ./easyrsa build-client-full client1 nopass
 ```
 
-Se il DNS OpenVPN deve stare su `10.9.0.5`, genera anche un certificato client con Common Name `dns1`:
+Se il DNS OpenVPN deve stare su `192.168.4.146`, genera anche un certificato client con Common Name `dns1`:
 
 ```bash
 sudo ./easyrsa build-client-full dns1 nopass
@@ -148,7 +148,7 @@ Sostituisci `eth0` con l'interfaccia pubblica reale del server se diversa:
 ```text
 *nat
 :POSTROUTING ACCEPT [0:0]
--A POSTROUTING -s 10.9.0.0/24 -o eth0 -j MASQUERADE
+-A POSTROUTING -s 192.168.4.0/24 -o eth0 -j MASQUERADE
 COMMIT
 ```
 
@@ -167,7 +167,7 @@ sudo ufw reload
 Se non usi UFW, puoi applicare temporaneamente NAT con:
 
 ```bash
-sudo iptables -t nat -A POSTROUTING -s 10.9.0.0/24 -o eth0 -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -s 192.168.4.0/24 -o eth0 -j MASQUERADE
 ```
 
 ## 6. Avvio servizio
@@ -217,4 +217,4 @@ OpenVPN:   sseapid.isti.cnr.it:1194/udp
 
 Sono pero' due VPN diverse. Un client OpenVPN non puo' collegarsi al server WireGuard e un client WireGuard non puo' collegarsi al server OpenVPN.
 
-Se i client OpenVPN devono usare DNS `10.9.0.5`, il client o servizio DNS con certificato `dns1` deve essere collegato alla VPN e deve ascoltare su `10.9.0.5`.
+Se i client OpenVPN devono usare DNS `192.168.4.146`, il client o servizio DNS con certificato `dns1` deve essere collegato alla VPN e deve ascoltare su `192.168.4.146`.

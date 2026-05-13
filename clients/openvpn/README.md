@@ -22,7 +22,7 @@ sseapid.isti.cnr.it:1194/udp
 Il DNS consegnato dal server OpenVPN ai client e':
 
 ```text
-10.9.0.5
+192.168.4.146
 ```
 
 La configurazione Docker puo' avviare anche OpenVPN con:

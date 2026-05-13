@@ -12,8 +12,8 @@ services:
       - SERVERURL=${SERVERURL:-sseapid.isti.cnr.it}
       - SERVERPORT=${SERVERPORT:-51820}
       - PEERS=${PEERS:-android1}
-      - PEERDNS=${PEERDNS:-10.8.0.1}
-      - INTERNAL_SUBNET=${INTERNAL_SUBNET:-10.8.0.0}
+      - PEERDNS=${PEERDNS:-192.168.4.146}
+      - INTERNAL_SUBNET=${INTERNAL_SUBNET:-192.168.4.0}
       - ALLOWEDIPS=${ALLOWEDIPS:-0.0.0.0/0,::/0}
       - LOG_CONFS=false
     volumes:

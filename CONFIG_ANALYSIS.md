@@ -8,8 +8,8 @@ La configurazione server attuale e' basata su WireGuard in Docker:
 - immagine: `lscr.io/linuxserver/wireguard:latest`
 - porta pubblica: UDP `51820`
 - dominio pubblico: `sseapid.isti.cnr.it`
-- subnet VPN: `10.8.0.0/24`
-- IP WireGuard del server: `10.8.0.1`
+- subnet VPN: `192.168.4.0/24`
+- IP WireGuard del server: `192.168.4.1`
 
 ## Client WireGuard
 
@@ -22,21 +22,21 @@ android1,android2,android3,macos1,windows1,linux1
 Con questa configurazione gli IP attesi sono:
 
 ```text
-android1  -> 10.8.0.2
-android2  -> 10.8.0.3
-android3  -> 10.8.0.4
-macos1    -> 10.8.0.5
-windows1  -> 10.8.0.6
-linux1    -> 10.8.0.7
+android1  -> 192.168.4.150
+android2  -> 192.168.4.151
+android3  -> 192.168.4.152
+macos1    -> 192.168.4.146
+windows1  -> 192.168.4.154
+linux1    -> 192.168.4.155
 ```
 
 Il DNS consegnato ai client e':
 
 ```text
-10.8.0.5
+192.168.4.146
 ```
 
-Quindi `macos1` deve essere davvero il resolver DNS locale, oppure l'indirizzo `10.8.0.5` va riservato a un servizio DNS dedicato.
+Quindi `macos1` deve essere davvero il resolver DNS locale, oppure l'indirizzo `192.168.4.146` va riservato a un servizio DNS dedicato.
 
 ## Routing
 
@@ -86,16 +86,16 @@ openvpn/INSTALL_UBUNTU.md
 La rete OpenVPN proposta e':
 
 ```text
-10.9.0.0/24
+192.168.4.0/24
 ```
 
 Il DNS OpenVPN configurato e':
 
 ```text
-10.9.0.5
+192.168.4.146
 ```
 
-L'indirizzo `10.9.0.5` e' riservato al client/servizio `dns1` tramite:
+L'indirizzo `192.168.4.146` e' riservato al client/servizio `dns1` tramite:
 
 ```text
 openvpn/ccd/dns1

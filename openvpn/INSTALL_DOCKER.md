@@ -11,14 +11,14 @@ Le variabili sono in `.env`:
 ```dotenv
 OPENVPN_SERVER=sseapid.isti.cnr.it
 OPENVPN_PORT=1194
-OPENVPN_SUBNET=10.9.0.0/24
-OPENVPN_DNS=10.9.0.5
-OPENVPN_POOL_START=10.9.0.10
-OPENVPN_POOL_END=10.9.0.254
+OPENVPN_SUBNET=192.168.4.0/24
+OPENVPN_DNS=192.168.4.146
+OPENVPN_POOL_START=192.168.4.150
+OPENVPN_POOL_END=192.168.4.254
 OPENVPN_CLIENTS=client1,dns1
 ```
 
-Il DNS OpenVPN e' `10.9.0.5`. Lo script riserva quell'indirizzo al client `dns1` tramite CCD.
+Il DNS OpenVPN e' `192.168.4.146`. Lo script riserva quell'indirizzo al client `dns1` tramite CCD.
 
 Lo script rimuove anche eventuali DNS pubblici aggiunti dalla configurazione generata:
 
@@ -30,24 +30,24 @@ push "dhcp-option DNS 8.8.4.4"
 La configurazione finale deve distribuire solo:
 
 ```text
-push "dhcp-option DNS 10.9.0.5"
+push "dhcp-option DNS 192.168.4.146"
 ```
 
 Lo script modifica la direttiva OpenVPN generata da:
 
 ```text
-server 10.9.0.0 255.255.255.0
+server 192.168.4.0 255.255.255.0
 ```
 
 a:
 
 ```text
 topology subnet
-server 10.9.0.0 255.255.255.0 nopool
-ifconfig-pool 10.9.0.10 10.9.0.254 255.255.255.0
+server 192.168.4.0 255.255.255.0 nopool
+ifconfig-pool 192.168.4.150 192.168.4.254 255.255.255.0
 ```
 
-`topology subnet` e' necessaria per usare una netmask esplicita in `ifconfig-pool` e per assegnare `10.9.0.5` a `dns1` con `ifconfig-push`. Questo evita che `10.9.0.5` venga assegnato a client casuali dal pool dinamico.
+`topology subnet` e' necessaria per usare una netmask esplicita in `ifconfig-pool` e per assegnare `192.168.4.146` a `dns1` con `ifconfig-push`. Questo evita che `192.168.4.146` venga assegnato a client casuali dal pool dinamico.
 
 ## Installazione e avvio
 
@@ -84,7 +84,7 @@ clients/openvpn/generated/android-openvpn1.ovpn
 
 Questi file contengono segreti e sono esclusi da Git.
 
-`dns1.ovpn` e' il profilo del client/servizio che riceve l'IP statico `10.9.0.5`.
+`dns1.ovpn` e' il profilo del client/servizio che riceve l'IP statico `192.168.4.146`.
 
 ## Avvio e log
 
