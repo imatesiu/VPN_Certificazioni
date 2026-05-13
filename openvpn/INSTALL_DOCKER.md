@@ -29,11 +29,12 @@ server 10.9.0.0 255.255.255.0
 a:
 
 ```text
+topology subnet
 server 10.9.0.0 255.255.255.0 nopool
 ifconfig-pool 10.9.0.10 10.9.0.254 255.255.255.0
 ```
 
-Questo evita che `10.9.0.5` venga assegnato a client casuali dal pool dinamico.
+`topology subnet` e' necessaria per usare una netmask esplicita in `ifconfig-pool` e per assegnare `10.9.0.5` a `dns1` con `ifconfig-push`. Questo evita che `10.9.0.5` venga assegnato a client casuali dal pool dinamico.
 
 ## Installazione e avvio
 

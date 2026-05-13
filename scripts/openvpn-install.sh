@@ -128,6 +128,12 @@ ensure_openvpn_config() {
     edit_as_root sed -i.bak -E 's/^(server[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+)$/\1 nopool/' "$APP_DIR/openvpn-data/conf/openvpn.conf"
   fi
 
+  if grep -q '^topology ' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
+    edit_as_root sed -i.bak -E 's/^topology .*/topology subnet/' "$APP_DIR/openvpn-data/conf/openvpn.conf"
+  else
+    printf 'topology subnet\n' | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
+  fi
+
   if ! grep -q '^client-config-dir /etc/openvpn/ccd' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
     printf '\nclient-config-dir /etc/openvpn/ccd\n' | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
   fi
