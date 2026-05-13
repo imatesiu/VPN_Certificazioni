@@ -20,6 +20,19 @@ OPENVPN_CLIENTS=client1,dns1
 
 Il DNS OpenVPN e' `10.9.0.5`. Lo script riserva quell'indirizzo al client `dns1` tramite CCD.
 
+Lo script rimuove anche eventuali DNS pubblici aggiunti dalla configurazione generata:
+
+```text
+push "dhcp-option DNS 8.8.8.8"
+push "dhcp-option DNS 8.8.4.4"
+```
+
+La configurazione finale deve distribuire solo:
+
+```text
+push "dhcp-option DNS 10.9.0.5"
+```
+
 Lo script modifica la direttiva OpenVPN generata da:
 
 ```text

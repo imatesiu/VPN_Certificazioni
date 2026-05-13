@@ -121,6 +121,12 @@ ensure_openvpn_config() {
     docker_compose run --rm -e EASYRSA_BATCH=1 openvpn ovpn_initpki nopass
   fi
 
+  edit_as_root sed -i.bak -E '/^push "dhcp-option DNS (8\.8\.8\.8|8\.8\.4\.4)"$/d' "$APP_DIR/openvpn-data/conf/openvpn.conf"
+
+  if ! grep -q "^push \"dhcp-option DNS ${OPENVPN_DNS}\"" "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
+    printf 'push "dhcp-option DNS %s"\n' "$OPENVPN_DNS" | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
+  fi
+
   run_as_root mkdir -p "$APP_DIR/openvpn-data/conf/ccd"
   printf 'ifconfig-push %s 255.255.255.0\n' "$OPENVPN_DNS" | write_as_root "$APP_DIR/openvpn-data/conf/ccd/dns1"
 
