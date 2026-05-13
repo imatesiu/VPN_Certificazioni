@@ -16,16 +16,17 @@ La configurazione server attuale e' basata su WireGuard in Docker:
 I peer configurati in `.env` sono:
 
 ```text
-android1,android2,android3,macos1,windows1,linux1
+dns1,android1,android2,android3,macos1,windows1,linux1
 ```
 
 Con questa configurazione gli IP attesi sono:
 
 ```text
+dns1      -> 192.168.4.146
 android1  -> 192.168.4.150
 android2  -> 192.168.4.151
 android3  -> 192.168.4.152
-macos1    -> 192.168.4.146
+macos1    -> 192.168.4.153
 windows1  -> 192.168.4.154
 linux1    -> 192.168.4.155
 ```
@@ -36,7 +37,7 @@ Il DNS consegnato ai client e':
 192.168.4.146
 ```
 
-Quindi `macos1` deve essere davvero il resolver DNS locale, oppure l'indirizzo `192.168.4.146` va riservato a un servizio DNS dedicato.
+Quindi `dns1` deve essere davvero il resolver DNS locale, oppure l'indirizzo `192.168.4.146` va riservato a un servizio DNS dedicato.
 
 ## Routing
 
@@ -109,3 +110,5 @@ WireGuard e OpenVPN possono convivere:
 WireGuard: 51820/udp
 OpenVPN:   1194/udp
 ```
+
+Entrambe le configurazioni sono state portate su `192.168.4.0/24`. Se i due servizi sono attivi nello stesso momento sulla stessa macchina, la stessa subnet su due interfacce VPN diverse puo' creare ambiguita' di routing. La configurazione e' adatta a usare WireGuard oppure OpenVPN con lo stesso piano IP; per uso simultaneo conviene separare le subnet.

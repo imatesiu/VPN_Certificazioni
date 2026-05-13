@@ -28,7 +28,7 @@ La configurazione reale e' gia' in `.env`:
 ```dotenv
 SERVERURL=sseapid.isti.cnr.it
 SERVERPORT=51820
-PEERS=android1,android2,android3,macos1,windows1,linux1
+PEERS=dns1,android1,android2,android3,macos1,windows1,linux1
 PEERDNS=192.168.4.146
 ```
 
@@ -47,6 +47,13 @@ Poi avvia la VPN:
 ```
 
 Lo script di avvio scarica l'immagine WireGuard e avvia il servizio. La generazione delle configurazioni reali avviene dentro il container e viene salvata nel volume locale `wireguard/config/`.
+
+Dopo la prima generazione, `scripts/start.sh` applica anche il piano IP definito in `.env`:
+
+```dotenv
+WIREGUARD_SERVER_IP=192.168.4.1
+WIREGUARD_PEER_IPS=dns1=192.168.4.146,android1=192.168.4.150,android2=192.168.4.151,android3=192.168.4.152,macos1=192.168.4.153,windows1=192.168.4.154,linux1=192.168.4.155
+```
 
 Se la macchina e' dietro NAT o firewall perimetrale, inoltra UDP `51820` verso `sseapid.isti.cnr.it`.
 
@@ -96,7 +103,7 @@ Poi dall'app Android:
 Per aggiungere altri telefoni, modifica `PEERS` in `.env`, per esempio:
 
 ```dotenv
-PEERS=android1,android2,android3,android4,macos1,windows1,linux1
+PEERS=dns1,android1,android2,android3,android4,macos1,windows1,linux1
 ```
 
 poi ricrea il container:
@@ -110,7 +117,7 @@ poi ricrea il container:
 Sono configurati anche tre peer desktop:
 
 ```dotenv
-PEERS=android1,android2,android3,macos1,windows1,linux1
+PEERS=dns1,android1,android2,android3,macos1,windows1,linux1
 ```
 
 Dopo `./scripts/start.sh`, i profili reali saranno disponibili qui:
@@ -193,6 +200,8 @@ WireGuard: sseapid.isti.cnr.it:51820/udp
 OpenVPN:   sseapid.isti.cnr.it:1194/udp
 ```
 
+Nota: ora entrambe le configurazioni usano la subnet `192.168.4.0/24`. Questo rispetta il piano IP richiesto, ma se WireGuard e OpenVPN sono attivi contemporaneamente sulla stessa macchina possono comparire ambiguita' di routing per la stessa rete. In produzione conviene usare una sola delle due VPN alla volta su quella subnet, oppure separare le subnet.
+
 ## DNS locale
 
 I dispositivi Android collegati alla VPN useranno il DNS indicato da `PEERDNS` in `.env`.
@@ -203,7 +212,7 @@ La configurazione attuale usa:
 PEERDNS=192.168.4.146
 ```
 
-Usa questo valore se il resolver DNS locale e' raggiungibile dai client VPN all'indirizzo `192.168.4.146`. Con l'ordine peer attuale, `192.168.4.146` e' assegnato a `macos1`, quindi quel peer deve essere il DNS locale oppure va riservato a un servizio DNS dedicato.
+Usa questo valore se il resolver DNS locale e' raggiungibile dai client VPN all'indirizzo `192.168.4.146`. Con il piano IP attuale, `192.168.4.146` e' riservato al peer/servizio `dns1`.
 
 Se invece il DNS locale e' su una rete interna, sostituisci il valore con il suo IP, per esempio:
 

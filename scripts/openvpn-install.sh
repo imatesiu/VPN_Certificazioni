@@ -23,6 +23,15 @@ OPENVPN_DNS="${OPENVPN_DNS:-192.168.4.146}"
 OPENVPN_POOL_START="${OPENVPN_POOL_START:-192.168.4.150}"
 OPENVPN_POOL_END="${OPENVPN_POOL_END:-192.168.4.254}"
 OPENVPN_CLIENTS="${OPENVPN_CLIENTS:-client1,dns1}"
+OPENVPN_NETWORK="${OPENVPN_SUBNET%%/*}"
+OPENVPN_CIDR="${OPENVPN_SUBNET#*/}"
+
+if [ "$OPENVPN_CIDR" != "24" ]; then
+  echo "Questo script supporta al momento solo subnet OpenVPN /24. Valore ricevuto: $OPENVPN_SUBNET" >&2
+  exit 1
+fi
+
+OPENVPN_NETMASK="255.255.255.0"
 
 run_as_root() {
   if [ "$(id -u)" -eq 0 ]; then
@@ -121,17 +130,17 @@ ensure_openvpn_config() {
     docker_compose run --rm -e EASYRSA_BATCH=1 openvpn ovpn_initpki nopass
   fi
 
-  edit_as_root sed -i.bak -E '/^push "dhcp-option DNS (8\.8\.8\.8|8\.8\.4\.4)"$/d' "$APP_DIR/openvpn-data/conf/openvpn.conf"
+  edit_as_root sed -i.bak -E '/^push "dhcp-option DNS /d' "$APP_DIR/openvpn-data/conf/openvpn.conf"
 
-  if ! grep -q "^push \"dhcp-option DNS ${OPENVPN_DNS}\"" "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
-    printf 'push "dhcp-option DNS %s"\n' "$OPENVPN_DNS" | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
-  fi
+  printf 'push "dhcp-option DNS %s"\n' "$OPENVPN_DNS" | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
 
   run_as_root mkdir -p "$APP_DIR/openvpn-data/conf/ccd"
   printf 'ifconfig-push %s 255.255.255.0\n' "$OPENVPN_DNS" | write_as_root "$APP_DIR/openvpn-data/conf/ccd/dns1"
 
-  if grep -Eq '^server[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+$' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
-    edit_as_root sed -i.bak -E 's/^(server[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+)$/\1 nopool/' "$APP_DIR/openvpn-data/conf/openvpn.conf"
+  if grep -q '^server ' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
+    edit_as_root sed -i.bak -E "s#^server .*#server ${OPENVPN_NETWORK} ${OPENVPN_NETMASK} nopool#" "$APP_DIR/openvpn-data/conf/openvpn.conf"
+  else
+    printf 'server %s %s nopool\n' "$OPENVPN_NETWORK" "$OPENVPN_NETMASK" | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
   fi
 
   if grep -q '^topology ' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
@@ -144,9 +153,10 @@ ensure_openvpn_config() {
     printf '\nclient-config-dir /etc/openvpn/ccd\n' | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
   fi
 
-  if ! grep -q '^ifconfig-pool ' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
-    printf 'ifconfig-pool %s %s 255.255.255.0\n' "$OPENVPN_POOL_START" "$OPENVPN_POOL_END" | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
-  fi
+  edit_as_root sed -i.bak -E '/^ifconfig-pool /d' "$APP_DIR/openvpn-data/conf/openvpn.conf"
+  printf 'ifconfig-pool %s %s %s\n' "$OPENVPN_POOL_START" "$OPENVPN_POOL_END" "$OPENVPN_NETMASK" | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
+
+  run_as_root rm -f "$APP_DIR/openvpn-data/conf/ipp.txt"
 }
 
 generate_client() {
@@ -171,6 +181,8 @@ generate_client() {
 }
 
 generate_clients() {
+  rm -f "$APP_DIR/clients/openvpn/generated/"*.ovpn 2>/dev/null || true
+
   OLD_IFS="$IFS"
   IFS=','
   for RAW_CLIENT in $OPENVPN_CLIENTS; do

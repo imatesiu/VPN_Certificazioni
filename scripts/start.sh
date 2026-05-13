@@ -29,6 +29,8 @@ docker_compose() {
 }
 
 docker_compose pull wireguard
+docker_compose up -d wireguard
+"$APP_DIR/scripts/wireguard-apply-ip-plan.sh"
 docker_compose up -d --force-recreate wireguard
 
 echo

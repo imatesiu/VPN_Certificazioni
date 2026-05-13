@@ -116,6 +116,10 @@ Poi rilancia:
 
 Lo script non rigenera la PKI esistente; crea solo i client mancanti e aggiorna i profili `.ovpn`.
 
+Se cambi `OPENVPN_SUBNET`, `OPENVPN_DNS`, `OPENVPN_POOL_START` o `OPENVPN_POOL_END`, lo script aggiorna anche `openvpn-data/conf/openvpn.conf` gia' esistente.
+
+Lo script elimina anche `openvpn-data/conf/ipp.txt`, perche' OpenVPN puo' ricordare vecchie assegnazioni IP li' dentro. Senza questa pulizia un client potrebbe continuare a ricevere un vecchio IP anche dopo la modifica della subnet.
+
 ## Permessi del volume
 
 Il container crea alcuni file in `openvpn-data/conf/` come root. Lo script usa `sudo` quando deve aggiornare `openvpn.conf` o `ccd/dns1`.

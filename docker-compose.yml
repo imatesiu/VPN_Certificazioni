@@ -11,7 +11,7 @@ services:
       - TZ=${TZ:-Europe/Rome}
       - SERVERURL=${SERVERURL:-sseapid.isti.cnr.it}
       - SERVERPORT=${SERVERPORT:-51820}
-      - PEERS=${PEERS:-android1}
+      - PEERS=${PEERS:-dns1,android1,android2,android3,macos1,windows1,linux1}
       - PEERDNS=${PEERDNS:-192.168.4.146}
       - INTERNAL_SUBNET=${INTERNAL_SUBNET:-192.168.4.0}
       - ALLOWEDIPS=${ALLOWEDIPS:-0.0.0.0/0,::/0}
