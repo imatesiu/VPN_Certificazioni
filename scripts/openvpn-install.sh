@@ -50,6 +50,14 @@ append_as_root() {
   fi
 }
 
+edit_as_root() {
+  if [ "$(id -u)" -eq 0 ]; then
+    "$@"
+  else
+    sudo "$@"
+  fi
+}
+
 docker_compose() {
   if docker ps >/dev/null 2>&1; then
     docker compose "$@"
@@ -116,6 +124,10 @@ ensure_openvpn_config() {
   run_as_root mkdir -p "$APP_DIR/openvpn-data/conf/ccd"
   printf 'ifconfig-push %s 255.255.255.0\n' "$OPENVPN_DNS" | write_as_root "$APP_DIR/openvpn-data/conf/ccd/dns1"
 
+  if grep -Eq '^server[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+$' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
+    edit_as_root sed -i.bak -E 's/^(server[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+)$/\1 nopool/' "$APP_DIR/openvpn-data/conf/openvpn.conf"
+  fi
+
   if ! grep -q '^client-config-dir /etc/openvpn/ccd' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
     printf '\nclient-config-dir /etc/openvpn/ccd\n' | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
   fi
@@ -161,7 +173,7 @@ ensure_docker
 open_firewall
 ensure_openvpn_config
 generate_clients
-docker_compose up -d openvpn
+docker_compose up -d --force-recreate openvpn
 
 echo
 echo "Server OpenVPN Docker avviato."

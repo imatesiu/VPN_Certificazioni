@@ -20,6 +20,21 @@ OPENVPN_CLIENTS=client1,dns1
 
 Il DNS OpenVPN e' `10.9.0.5`. Lo script riserva quell'indirizzo al client `dns1` tramite CCD.
 
+Lo script modifica la direttiva OpenVPN generata da:
+
+```text
+server 10.9.0.0 255.255.255.0
+```
+
+a:
+
+```text
+server 10.9.0.0 255.255.255.0 nopool
+ifconfig-pool 10.9.0.10 10.9.0.254 255.255.255.0
+```
+
+Questo evita che `10.9.0.5` venga assegnato a client casuali dal pool dinamico.
+
 ## Installazione e avvio
 
 Sul server:
@@ -50,9 +65,12 @@ Profili client:
 ```text
 clients/openvpn/generated/client1.ovpn
 clients/openvpn/generated/dns1.ovpn
+clients/openvpn/generated/android-openvpn1.ovpn
 ```
 
 Questi file contengono segreti e sono esclusi da Git.
+
+`dns1.ovpn` e' il profilo del client/servizio che riceve l'IP statico `10.9.0.5`.
 
 ## Avvio e log
 
@@ -93,3 +111,5 @@ Se l'esecuzione era stata interrotta prima di questa correzione, rilancia sempli
 ```bash
 ./scripts/openvpn-install.sh
 ```
+
+Lo script ricrea il container OpenVPN per applicare anche i `sysctls` richiesti dal container.

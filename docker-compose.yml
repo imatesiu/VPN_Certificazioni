@@ -32,6 +32,9 @@ services:
     container_name: vpn-openvpn
     cap_add:
       - NET_ADMIN
+    sysctls:
+      - net.ipv6.conf.default.forwarding=1
+      - net.ipv6.conf.all.forwarding=1
     volumes:
       - ./openvpn-data/conf:/etc/openvpn
     ports:
