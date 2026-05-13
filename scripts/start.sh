@@ -28,8 +28,8 @@ docker_compose() {
   fi
 }
 
-docker_compose pull
-docker_compose up -d --force-recreate
+docker_compose pull wireguard
+docker_compose up -d --force-recreate wireguard
 
 echo
 echo "VPN WireGuard avviata."

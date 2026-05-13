@@ -1,6 +1,6 @@
 # VPN server sseapid.isti.cnr.it
 
-Configurazione reale per creare un servizio VPN WireGuard su `sseapid.isti.cnr.it`. WireGuard e' la scelta piu' semplice per dispositivi Android perche' i profili si importano tramite QR code.
+Configurazione reale per creare servizi VPN su `sseapid.isti.cnr.it`: WireGuard in Docker e OpenVPN in Docker. WireGuard resta la scelta piu' semplice per dispositivi Android perche' i profili si importano tramite QR code; OpenVPN e' disponibile per client o policy che lo richiedono.
 
 Il certificato Let's Encrypt eventualmente gia' presente a bordo non serve a WireGuard, perche' WireGuard non usa TLS: usa chiavi pubbliche/private proprie. Il certificato resta utile per servizi HTTPS sulla stessa macchina o per un eventuale portale di distribuzione profili, ma non entra nella configurazione VPN WireGuard.
 
