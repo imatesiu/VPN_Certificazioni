@@ -11,6 +11,12 @@ Il certificato Let's Encrypt eventualmente gia' presente a bordo non serve a Wir
 - `wireguard/wg0.conf`: configurazione server WireGuard, senza chiavi private hardcoded.
 - `wireguard/android-client.conf`: configurazione Android WireGuard, senza chiavi private hardcoded.
 - `clients/`: configurazioni client per macOS, Windows e Linux, senza chiavi private hardcoded.
+- `clients/openvpn/sseapid-client.ovpn`: profilo client OpenVPN, senza certificati reali inline.
+- `openvpn/server.conf`: configurazione server OpenVPN nativa per Ubuntu.
+- `openvpn/INSTALL_DOCKER.md`: guida installazione OpenVPN server in Docker.
+- `openvpn/INSTALL_UBUNTU.md`: guida installazione OpenVPN server su Ubuntu.
+- `openvpn/LETSENCRYPT.md`: note sull'uso di certificati Let's Encrypt con OpenVPN.
+- `CONFIG_ANALYSIS.md`: analisi sintetica dello stato VPN.
 - `scripts/install.sh`: installa i pacchetti necessari e prepara firewall/directory.
 - `scripts/start.sh`: scarica l'immagine WireGuard e avvia il servizio containerizzato.
 - `scripts/show-android-qr.sh`: mostra a terminale il QR code di un profilo Android generato.
@@ -121,6 +127,70 @@ Nel repository ci sono anche configurazioni leggibili senza chiavi reali:
 clients/macos/sseapid-wireguard.conf
 clients/windows/sseapid-wireguard.conf
 clients/linux/sseapid-wireguard.conf
+```
+
+## OpenVPN client
+
+E' disponibile anche un profilo client OpenVPN:
+
+```text
+clients/openvpn/sseapid-client.ovpn
+```
+
+Questo file non contiene certificati o chiavi private reali. Per usarlo devi inserire CA, certificato client, chiave privata client e chiave `tls-crypt`.
+
+Nota importante: il profilo OpenVPN funziona solo dopo aver inizializzato e avviato il server OpenVPN con `./scripts/openvpn-install.sh`.
+
+## OpenVPN server Ubuntu
+
+La modalita' consigliata per OpenVPN in questo repository e' Docker:
+
+```bash
+./scripts/openvpn-install.sh
+```
+
+Lo script genera configurazione server, PKI, certificati client e profili `.ovpn` dentro:
+
+```text
+openvpn-data/conf/
+clients/openvpn/generated/
+```
+
+Documentazione:
+
+```text
+openvpn/INSTALL_DOCKER.md
+```
+
+E' disponibile anche una configurazione server OpenVPN nativa per Ubuntu:
+
+```text
+openvpn/server.conf
+openvpn/client-template.ovpn
+openvpn/INSTALL_UBUNTU.md
+```
+
+OpenVPN usa una rete separata:
+
+```text
+10.9.0.0/24
+```
+
+Il DNS consegnato ai client OpenVPN e':
+
+```text
+10.9.0.5
+```
+
+Questo IP e' riservato al client/servizio `dns1` con `openvpn/ccd/dns1`.
+
+Per OpenVPN manteniamo come default una PKI Easy-RSA dedicata. Il certificato Let's Encrypt di `sseapid.isti.cnr.it` puo' autenticare il server TLS, ma non sostituisce i certificati client OpenVPN e complica rinnovo/revoca; le note sono in `openvpn/LETSENCRYPT.md`.
+
+WireGuard e OpenVPN possono convivere sulla stessa macchina:
+
+```text
+WireGuard: sseapid.isti.cnr.it:51820/udp
+OpenVPN:   sseapid.isti.cnr.it:1194/udp
 ```
 
 ## DNS locale

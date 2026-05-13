@@ -1,7 +1,10 @@
 .DS_Store
 wireguard/config/
+openvpn-data/
+clients/openvpn/generated/
 *.key
 *.crt
 *.csr
 *.pem
-*.ovpn
+clients/openvpn/private/
+clients/openvpn/*.private.ovpn
