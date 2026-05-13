@@ -32,6 +32,24 @@ run_as_root() {
   fi
 }
 
+write_as_root() {
+  TARGET_FILE="$1"
+  if [ "$(id -u)" -eq 0 ]; then
+    tee "$TARGET_FILE" >/dev/null
+  else
+    sudo tee "$TARGET_FILE" >/dev/null
+  fi
+}
+
+append_as_root() {
+  TARGET_FILE="$1"
+  if [ "$(id -u)" -eq 0 ]; then
+    tee -a "$TARGET_FILE" >/dev/null
+  else
+    sudo tee -a "$TARGET_FILE" >/dev/null
+  fi
+}
+
 docker_compose() {
   if docker ps >/dev/null 2>&1; then
     docker compose "$@"
@@ -95,15 +113,15 @@ ensure_openvpn_config() {
     docker_compose run --rm -e EASYRSA_BATCH=1 openvpn ovpn_initpki nopass
   fi
 
-  mkdir -p "$APP_DIR/openvpn-data/conf/ccd"
-  printf 'ifconfig-push %s 255.255.255.0\n' "$OPENVPN_DNS" > "$APP_DIR/openvpn-data/conf/ccd/dns1"
+  run_as_root mkdir -p "$APP_DIR/openvpn-data/conf/ccd"
+  printf 'ifconfig-push %s 255.255.255.0\n' "$OPENVPN_DNS" | write_as_root "$APP_DIR/openvpn-data/conf/ccd/dns1"
 
   if ! grep -q '^client-config-dir /etc/openvpn/ccd' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
-    printf '\nclient-config-dir /etc/openvpn/ccd\n' >> "$APP_DIR/openvpn-data/conf/openvpn.conf"
+    printf '\nclient-config-dir /etc/openvpn/ccd\n' | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
   fi
 
   if ! grep -q '^ifconfig-pool ' "$APP_DIR/openvpn-data/conf/openvpn.conf"; then
-    printf 'ifconfig-pool %s %s 255.255.255.0\n' "$OPENVPN_POOL_START" "$OPENVPN_POOL_END" >> "$APP_DIR/openvpn-data/conf/openvpn.conf"
+    printf 'ifconfig-pool %s %s 255.255.255.0\n' "$OPENVPN_POOL_START" "$OPENVPN_POOL_END" | append_as_root "$APP_DIR/openvpn-data/conf/openvpn.conf"
   fi
 }
 

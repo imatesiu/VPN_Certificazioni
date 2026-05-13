@@ -83,3 +83,13 @@ Poi rilancia:
 ```
 
 Lo script non rigenera la PKI esistente; crea solo i client mancanti e aggiorna i profili `.ovpn`.
+
+## Permessi del volume
+
+Il container crea alcuni file in `openvpn-data/conf/` come root. Lo script usa `sudo` quando deve aggiornare `openvpn.conf` o `ccd/dns1`.
+
+Se l'esecuzione era stata interrotta prima di questa correzione, rilancia semplicemente:
+
+```bash
+./scripts/openvpn-install.sh
+```
