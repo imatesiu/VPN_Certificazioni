@@ -61,8 +61,10 @@ install_runtime_hooks
 
 delete_config_lines '/^ifconfig-pool /d'
 delete_config_lines '/^route 192\.168\.1\.146 255\.255\.255\.255$/d'
+delete_config_lines '/redirect-gateway/d'
 add_config_line "topology subnet"
 add_config_line "client-config-dir /etc/openvpn/ccd"
+add_config_line "push \"route ${PUBLIC_SERVICE_IP} 255.255.255.255\""
 add_config_line "script-security 2"
 add_config_line "up /etc/openvpn/scripts/container-up.sh"
 add_config_line "down /etc/openvpn/scripts/container-down.sh"

@@ -53,6 +53,24 @@ PC1 client:     10.8.0.5
 PC2 client:     DHCP OpenVPN, dal pool implicito del server
 ```
 
+## Routing Internet
+
+La configurazione e' split tunnel: i client VPN non usano `gram.isti.cnr.it` come uscita Internet generale.
+
+Nella VPN passa solo il traffico verso:
+
+```text
+146.48.84.211/32
+```
+
+Tutto il resto continua a uscire dalla rete normale del client, per esempio LTE su Android o LAN/Wi-Fi sui PC.
+
+Questo e' ottenuto evitando `redirect-gateway` e spingendo solo:
+
+```text
+push "route 146.48.84.211 255.255.255.255"
+```
+
 ## Configurazione
 
 Sulla macchina `gram.isti.cnr.it`:
@@ -95,6 +113,7 @@ Lo script:
 - configura `ccd` solo per `pc1`, che resta statico a `10.8.0.5`;
 - lascia `android1` e `pc2` in DHCP OpenVPN usando il pool implicito creato dalla direttiva `server`;
 - aggiunge gli hook che faranno DNAT sulla VPN `146.48.84.211 -> 10.8.0.5`;
+- rimuove eventuali vecchie direttive `redirect-gateway`, cosi' il traffico Internet generico resta sulla rete normale del client;
 - genera i profili client.
 
 ## Avvio server
