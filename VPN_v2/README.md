@@ -33,11 +33,25 @@ con valori diversi.
 
 - `.env.example`: variabili da copiare in `.env`.
 - `docker-compose.yml`: server OpenVPN Docker.
-- `scripts/init-and-start.sh`: genera CA, certificati, profili client e avvia Docker.
+- `scripts/init.sh`: genera CA, certificati, configurazione server e profili client.
+- `scripts/start.sh`: avvia o ricrea il container OpenVPN.
+- `scripts/init-and-start.sh`: wrapper di compatibilita' che esegue `init.sh` e poi `start.sh`.
+- `scripts/common.sh`: funzioni condivise dagli script.
 - `scripts/container-up.sh`: regole iptables dentro il container.
 - `scripts/pc-client-linux-setup.sh`: preparazione minima del PC Linux client.
 - `clients/android1.ovpn`: generato dallo script.
 - `clients/pc1.ovpn`: generato dallo script.
+- `clients/pc2.ovpn`: generato dallo script.
+
+## Piano IP VPN
+
+```text
+Subnet VPN:     10.8.0.0/24
+Server OpenVPN: 10.8.0.1
+Android:        DHCP OpenVPN
+PC1 client:     10.8.0.5
+PC2 client:     DHCP OpenVPN
+```
 
 ## Configurazione
 
@@ -53,6 +67,8 @@ Modifica `.env`:
 ```dotenv
 VPN_SERVER_PUBLIC_HOST=gram.isti.cnr.it
 VPN_PORT=1194
+VPN_SUBNET=10.8.0.0/24
+PC_VPN_IP=10.8.0.5
 PUBLIC_SERVICE_IP=146.48.84.211
 PC_LAN_IP=192.168.1.146
 ```
@@ -63,12 +79,12 @@ Apri sul firewall del server pubblico:
 UDP 1194
 ```
 
-## Generazione chiavi, profili e avvio server
+## Generazione chiavi e profili
 
 Sulla macchina `gram.isti.cnr.it`:
 
 ```bash
-./scripts/init-and-start.sh
+./scripts/init.sh
 ```
 
 Lo script:
@@ -76,20 +92,38 @@ Lo script:
 - scarica l'immagine Docker `kylemanna/openvpn`;
 - genera configurazione server OpenVPN;
 - crea CA e certificati;
-- crea i client `android1` e `pc1`;
-- configura `ccd` con IP statici;
-- aggiunge DNAT `146.48.84.211 -> 192.168.1.146`;
-- avvia il container.
+- crea i client `android1`, `pc1` e `pc2`;
+- configura `ccd` solo per `pc1`, che resta statico a `10.8.0.5`;
+- lascia `android1` e `pc2` in DHCP OpenVPN;
+- aggiunge gli hook che faranno DNAT `146.48.84.211 -> 192.168.1.146`;
+- genera i profili client.
+
+## Avvio server
+
+Sulla macchina `gram.isti.cnr.it`:
+
+```bash
+./scripts/start.sh
+```
+
+Lo script copia gli hook runtime aggiornati dentro `data/conf/scripts` e ricrea il container con:
+
+```bash
+docker compose up -d --force-recreate
+```
 
 Nota: alcuni file dentro `data/conf` vengono creati dal container come `root`. Lo script usa `sudo` quando deve aggiornare `ccd`, script di hook e profili generati.
 
-Se il container esce con errori su IPv6 forwarding o `net.ipv4.ip_forward`, rilancia questo script: la configurazione Docker passa i sysctl necessari al container e lo ricrea con `--force-recreate`.
+Se su `gram.isti.cnr.it` avevi gia' generato `data/conf/openvpn.conf` con la vecchia subnet `10.84.0.0/24`, `init.sh` non la sovrascrive automaticamente. Per passare davvero a `10.8.0.0/24`, rigenera la configurazione o aggiorna manualmente `data/conf/openvpn.conf` prima di avviare il container.
+
+Se il container esce con errori su IPv6 forwarding o `net.ipv4.ip_forward`, rilancia `./scripts/start.sh`: la configurazione Docker passa i sysctl necessari al container e lo ricrea con `--force-recreate`.
 
 Profili generati:
 
 ```text
 VPN_v2/clients/android1.ovpn
 VPN_v2/clients/pc1.ovpn
+VPN_v2/clients/pc2.ovpn
 ```
 
 ## PC 192.168.1.146
@@ -108,6 +142,16 @@ sudo openvpn --config VPN_v2/clients/pc1.ovpn
 ```
 
 Il servizio locale deve ascoltare su `192.168.1.146` oppure su `0.0.0.0`.
+
+## Secondo PC
+
+Il secondo PC usa:
+
+```text
+VPN_v2/clients/pc2.ovpn
+```
+
+`pc2` riceve l'indirizzo dal pool DHCP OpenVPN e non pubblica rotte verso `192.168.1.146`.
 
 ## Android
 
