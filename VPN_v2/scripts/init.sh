@@ -60,6 +60,7 @@ EOF
 install_runtime_hooks
 
 delete_config_lines '/^ifconfig-pool /d'
+delete_config_lines '/^route 192\.168\.254\.0 255\.255\.255\.0$/d'
 delete_config_lines '/^route 192\.168\.1\.146 255\.255\.255\.255$/d'
 delete_config_lines '/redirect-gateway/d'
 add_config_line "topology subnet"
@@ -69,9 +70,27 @@ add_config_line "script-security 2"
 add_config_line "up /etc/openvpn/scripts/container-up.sh"
 add_config_line "down /etc/openvpn/scripts/container-down.sh"
 
-docker compose run --rm openvpn ovpn_getclient android1 | write_file clients/android1.ovpn
-docker compose run --rm openvpn ovpn_getclient pc1 | write_file clients/pc1.ovpn
-docker compose run --rm openvpn ovpn_getclient pc2 | write_file clients/pc2.ovpn
+generate_split_client_profile() {
+  local client_name="$1"
+  local output_file="$2"
+
+  docker compose run --rm openvpn ovpn_getclient "$client_name" | \
+    sed -E '/redirect-gateway/d;/^redirect-private/d;/^route 0\.0\.0\.0/d;/^route 128\.0\.0\.0/d;/^route-nopull/d;/^route 146\.48\.84\.211 /d' | \
+    awk -v public_service_ip="$PUBLIC_SERVICE_IP" '
+      /^client$/ && !done {
+        print
+        print "route-nopull"
+        print "route " public_service_ip " 255.255.255.255"
+        done = 1
+        next
+      }
+      { print }
+    ' | write_file "$output_file"
+}
+
+generate_split_client_profile android1 clients/android1.ovpn
+generate_split_client_profile pc1 clients/pc1.ovpn
+generate_split_client_profile pc2 clients/pc2.ovpn
 run_as_root chmod 600 clients/android1.ovpn clients/pc1.ovpn clients/pc2.ovpn
 
 cat <<EOF

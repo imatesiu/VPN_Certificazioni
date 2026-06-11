@@ -71,6 +71,15 @@ Questo e' ottenuto evitando `redirect-gateway` e spingendo solo:
 push "route 146.48.84.211 255.255.255.255"
 ```
 
+In piu', i profili client generati da `init.sh` includono:
+
+```text
+route-nopull
+route 146.48.84.211 255.255.255.255
+```
+
+Questo evita che eventuali direttive di rotta generiche o profili vecchi trasformino la VPN in default gateway.
+
 ## Configurazione
 
 Sulla macchina `gram.isti.cnr.it`:
@@ -114,6 +123,8 @@ Lo script:
 - lascia `android1` e `pc2` in DHCP OpenVPN usando il pool implicito creato dalla direttiva `server`;
 - aggiunge gli hook che faranno DNAT sulla VPN `146.48.84.211 -> 10.8.0.5`;
 - rimuove eventuali vecchie direttive `redirect-gateway`, cosi' il traffico Internet generico resta sulla rete normale del client;
+- rimuove eventuali rotte residue verso `192.168.254.0/24`;
+- genera profili client con `route-nopull` e sola rotta `146.48.84.211/32`;
 - genera i profili client.
 
 ## Avvio server
