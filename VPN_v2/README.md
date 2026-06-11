@@ -81,6 +81,8 @@ Lo script:
 - aggiunge DNAT `146.48.84.211 -> 192.168.1.146`;
 - avvia il container.
 
+Nota: alcuni file dentro `data/conf` vengono creati dal container come `root`. Lo script usa `sudo` quando deve aggiornare `ccd`, script di hook e profili generati.
+
 Profili generati:
 
 ```text
