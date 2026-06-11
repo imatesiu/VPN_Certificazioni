@@ -114,7 +114,18 @@ docker compose up -d --force-recreate
 
 Nota: alcuni file dentro `data/conf` vengono creati dal container come `root`. Lo script usa `sudo` quando deve aggiornare `ccd`, script di hook e profili generati.
 
-Se su `gram.isti.cnr.it` avevi gia' generato `data/conf/openvpn.conf` con la vecchia subnet `10.84.0.0/24`, `init.sh` non la sovrascrive automaticamente. Per passare davvero a `10.8.0.0/24`, rigenera la configurazione o aggiorna manualmente `data/conf/openvpn.conf` prima di avviare il container.
+Se su `gram.isti.cnr.it` avevi gia' generato `data/conf/openvpn.conf` con una subnet diversa, `init.sh` si ferma. Il messaggio `Processing Route Config: '192.168.254.0/24'` indica quasi sempre una configurazione OpenVPN gia' presente generata con il default dell'immagine `kylemanna/openvpn`, non con il nostro `VPN_SUBNET=10.8.0.0/24`.
+
+Per rigenerare da zero:
+
+```bash
+docker compose down
+sudo mv data/conf data/conf.backup.$(date +%Y%m%d-%H%M%S)
+./scripts/init.sh
+./scripts/start.sh
+```
+
+Questa operazione rigenera CA, certificati e profili client. Conserva prima eventuali profili gia' distribuiti se devi ancora usarli.
 
 Se il container esce con errori su IPv6 forwarding o `net.ipv4.ip_forward`, rilancia `./scripts/start.sh`: la configurazione Docker passa i sysctl necessari al container e lo ricrea con `--force-recreate`.
 

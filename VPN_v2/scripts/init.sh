@@ -19,10 +19,18 @@ if [ ! -f data/conf/openvpn.conf ]; then
     -p "route ${PUBLIC_SERVICE_IP} 255.255.255.255"
 elif ! grep -q '10\.8\.0\.0 255\.255\.255\.0' data/conf/openvpn.conf; then
   cat >&2 <<EOF
-ATTENZIONE: data/conf/openvpn.conf esiste gia' e potrebbe usare una subnet diversa da 10.8.0.0/24.
-Per cambiare subnet su una configurazione gia' generata, aggiorna manualmente openvpn.conf
-oppure rigenera data/conf dopo aver salvato i profili/certificati necessari.
+ERRORE: data/conf/openvpn.conf esiste gia' ma non usa la subnet 10.8.0.0/24.
+
+Questo succede quando la configurazione e' stata generata in precedenza con
+un'altra subnet, per esempio il default kylemanna/openvpn 192.168.254.0/24.
+
+Per rigenerare da zero:
+  1. ferma il container: docker compose down
+  2. salva eventuali profili/certificati che ti servono
+  3. rimuovi o rinomina data/conf
+  4. rilancia ./scripts/init.sh
 EOF
+  exit 1
 fi
 
 if [ ! -f data/conf/pki/ca.crt ]; then
