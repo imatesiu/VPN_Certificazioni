@@ -112,7 +112,7 @@ docker compose run --rm openvpn ovpn_getclient android1 | write_file clients/and
 docker compose run --rm openvpn ovpn_getclient pc1 | write_file clients/pc1.ovpn
 run_as_root chmod 600 clients/android1.ovpn clients/pc1.ovpn
 
-docker compose up -d
+docker compose up -d --force-recreate
 
 cat <<EOF
 

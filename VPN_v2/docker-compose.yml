@@ -4,6 +4,10 @@ services:
     container_name: vpn-v2-openvpn
     cap_add:
       - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.default.forwarding=1
+      - net.ipv6.conf.all.forwarding=1
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:

@@ -83,6 +83,8 @@ Lo script:
 
 Nota: alcuni file dentro `data/conf` vengono creati dal container come `root`. Lo script usa `sudo` quando deve aggiornare `ccd`, script di hook e profili generati.
 
+Se il container esce con errori su IPv6 forwarding o `net.ipv4.ip_forward`, rilancia questo script: la configurazione Docker passa i sysctl necessari al container e lo ricrea con `--force-recreate`.
+
 Profili generati:
 
 ```text
