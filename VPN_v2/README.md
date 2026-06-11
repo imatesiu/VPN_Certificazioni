@@ -48,6 +48,7 @@ con valori diversi.
 ```text
 Subnet VPN:     10.8.0.0/24
 Server OpenVPN: 10.8.0.1
+Pool DHCP:      10.8.0.100 - 10.8.0.254
 Android:        DHCP OpenVPN
 PC1 client:     10.8.0.5
 PC2 client:     DHCP OpenVPN
@@ -68,6 +69,8 @@ Modifica `.env`:
 VPN_SERVER_PUBLIC_HOST=gram.isti.cnr.it
 VPN_PORT=1194
 VPN_SUBNET=10.8.0.0/24
+VPN_POOL_START=10.8.0.100
+VPN_POOL_END=10.8.0.254
 PC_VPN_IP=10.8.0.5
 PUBLIC_SERVICE_IP=146.48.84.211
 PC_LAN_IP=192.168.1.146
@@ -94,7 +97,7 @@ Lo script:
 - crea CA e certificati;
 - crea i client `android1`, `pc1` e `pc2`;
 - configura `ccd` solo per `pc1`, che resta statico a `10.8.0.5`;
-- lascia `android1` e `pc2` in DHCP OpenVPN;
+- lascia `android1` e `pc2` in DHCP OpenVPN nel pool `10.8.0.100-10.8.0.254`;
 - aggiunge gli hook che faranno DNAT `146.48.84.211 -> 192.168.1.146`;
 - genera i profili client.
 

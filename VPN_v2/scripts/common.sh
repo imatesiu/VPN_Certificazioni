@@ -56,6 +56,15 @@ append_file() {
   fi
 }
 
+delete_config_lines() {
+  local expression="$1"
+  if [ "$(id -u)" -eq 0 ]; then
+    sed -i.bak -E "$expression" "$APP_DIR/data/conf/openvpn.conf"
+  else
+    sudo sed -i.bak -E "$expression" "$APP_DIR/data/conf/openvpn.conf"
+  fi
+}
+
 add_config_line() {
   local line="$1"
   grep -qxF "$line" "$APP_DIR/data/conf/openvpn.conf" || printf '%s\n' "$line" | append_file "$APP_DIR/data/conf/openvpn.conf"
