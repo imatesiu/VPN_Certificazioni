@@ -17,6 +17,6 @@ services:
     environment:
       - TZ=${TZ:-Europe/Rome}
       - PUBLIC_SERVICE_IP=${PUBLIC_SERVICE_IP:-146.48.84.211}
-      - PC_LAN_IP=${PC_LAN_IP:-192.168.1.146}
+      - PC_VPN_IP=${PC_VPN_IP:-10.8.0.5}
       - VPN_SUBNET=${VPN_SUBNET:-10.8.0.0/24}
     restart: unless-stopped

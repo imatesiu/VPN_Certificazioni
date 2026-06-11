@@ -55,15 +55,14 @@ run_as_root rm -f data/conf/ccd/android1 data/conf/ccd/pc2
 
 write_file data/conf/ccd/pc1 <<EOF
 ifconfig-push ${PC_VPN_IP:-10.8.0.5} 255.255.255.0
-iroute ${PC_LAN_IP} 255.255.255.255
 EOF
 
 install_runtime_hooks
 
 delete_config_lines '/^ifconfig-pool /d'
+delete_config_lines '/^route 192\.168\.1\.146 255\.255\.255\.255$/d'
 add_config_line "topology subnet"
 add_config_line "client-config-dir /etc/openvpn/ccd"
-add_config_line "route ${PC_LAN_IP} 255.255.255.255"
 add_config_line "script-security 2"
 add_config_line "up /etc/openvpn/scripts/container-up.sh"
 add_config_line "down /etc/openvpn/scripts/container-down.sh"

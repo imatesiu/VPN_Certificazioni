@@ -8,7 +8,7 @@ Android LTE  ─┐
 PC 192.168.1.146 ─┘
 ```
 
-Android e PC sono entrambi client OpenVPN. Il server pubblico `gram.isti.cnr.it` intercetta il traffico Android destinato a `146.48.84.211` e lo inoltra al PC tramite il tunnel.
+Android e PC sono entrambi client OpenVPN. Sulla VPN, il server pubblico `gram.isti.cnr.it` intercetta il traffico destinato a `146.48.84.211` e lo redirige al PC `pc1` sull'indirizzo VPN `10.8.0.5`.
 
 ## Nota critica sugli IP
 
@@ -70,7 +70,6 @@ VPN_PORT=1194
 VPN_SUBNET=10.8.0.0/24
 PC_VPN_IP=10.8.0.5
 PUBLIC_SERVICE_IP=146.48.84.211
-PC_LAN_IP=192.168.1.146
 ```
 
 Apri sul firewall del server pubblico:
@@ -95,7 +94,7 @@ Lo script:
 - crea i client `android1`, `pc1` e `pc2`;
 - configura `ccd` solo per `pc1`, che resta statico a `10.8.0.5`;
 - lascia `android1` e `pc2` in DHCP OpenVPN usando il pool implicito creato dalla direttiva `server`;
-- aggiunge gli hook che faranno DNAT `146.48.84.211 -> 192.168.1.146`;
+- aggiunge gli hook che faranno DNAT sulla VPN `146.48.84.211 -> 10.8.0.5`;
 - genera i profili client.
 
 ## Avvio server
@@ -154,7 +153,7 @@ sudo bash VPN_v2/scripts/pc-client-linux-setup.sh
 sudo openvpn --config VPN_v2/clients/pc1.ovpn
 ```
 
-Il servizio locale deve ascoltare su `192.168.1.146` oppure su `0.0.0.0`.
+Il servizio locale deve ascoltare su `10.8.0.5` oppure su `0.0.0.0`.
 
 ## Secondo PC
 
@@ -164,7 +163,7 @@ Il secondo PC usa:
 VPN_v2/clients/pc2.ovpn
 ```
 
-`pc2` riceve l'indirizzo dal pool DHCP OpenVPN e non pubblica rotte verso `192.168.1.146`.
+`pc2` riceve l'indirizzo dal pool DHCP OpenVPN e non riceve la redirezione destinata a `10.8.0.5`.
 
 ## Android
 
@@ -180,10 +179,10 @@ Quando Android invia messaggi a:
 146.48.84.211
 ```
 
-il server OpenVPN pubblico applica DNAT e inoltra il traffico nel tunnel verso:
+il server OpenVPN pubblico applica DNAT sulla VPN e inoltra il traffico verso:
 
 ```text
-192.168.1.146
+10.8.0.5
 ```
 
 ## Test
