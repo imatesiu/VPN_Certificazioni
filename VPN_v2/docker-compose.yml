@@ -1,0 +1,18 @@
+services:
+  openvpn:
+    image: kylemanna/openvpn:latest
+    container_name: vpn-v2-openvpn
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "${VPN_PORT:-1194}:1194/udp"
+    volumes:
+      - ./data/conf:/etc/openvpn
+    environment:
+      - TZ=${TZ:-Europe/Rome}
+      - PUBLIC_SERVICE_IP=${PUBLIC_SERVICE_IP:-146.48.84.211}
+      - PC_LAN_IP=${PC_LAN_IP:-192.168.1.146}
+      - VPN_SUBNET=${VPN_SUBNET:-10.84.0.0/24}
+    restart: unless-stopped
