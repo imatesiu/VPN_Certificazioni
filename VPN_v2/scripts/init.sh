@@ -55,7 +55,6 @@ install_runtime_hooks
 delete_config_lines '/^ifconfig-pool /d'
 add_config_line "topology subnet"
 add_config_line "client-config-dir /etc/openvpn/ccd"
-add_config_line "ifconfig-pool ${VPN_POOL_START:-10.8.0.100} ${VPN_POOL_END:-10.8.0.254} 255.255.255.0"
 add_config_line "route ${PC_LAN_IP} 255.255.255.255"
 add_config_line "script-security 2"
 add_config_line "up /etc/openvpn/scripts/container-up.sh"

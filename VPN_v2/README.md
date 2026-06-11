@@ -48,10 +48,9 @@ con valori diversi.
 ```text
 Subnet VPN:     10.8.0.0/24
 Server OpenVPN: 10.8.0.1
-Pool DHCP:      10.8.0.100 - 10.8.0.254
-Android:        DHCP OpenVPN
+Android:        DHCP OpenVPN, dal pool implicito del server
 PC1 client:     10.8.0.5
-PC2 client:     DHCP OpenVPN
+PC2 client:     DHCP OpenVPN, dal pool implicito del server
 ```
 
 ## Configurazione
@@ -69,8 +68,6 @@ Modifica `.env`:
 VPN_SERVER_PUBLIC_HOST=gram.isti.cnr.it
 VPN_PORT=1194
 VPN_SUBNET=10.8.0.0/24
-VPN_POOL_START=10.8.0.100
-VPN_POOL_END=10.8.0.254
 PC_VPN_IP=10.8.0.5
 PUBLIC_SERVICE_IP=146.48.84.211
 PC_LAN_IP=192.168.1.146
@@ -97,7 +94,7 @@ Lo script:
 - crea CA e certificati;
 - crea i client `android1`, `pc1` e `pc2`;
 - configura `ccd` solo per `pc1`, che resta statico a `10.8.0.5`;
-- lascia `android1` e `pc2` in DHCP OpenVPN nel pool `10.8.0.100-10.8.0.254`;
+- lascia `android1` e `pc2` in DHCP OpenVPN usando il pool implicito creato dalla direttiva `server`;
 - aggiunge gli hook che faranno DNAT `146.48.84.211 -> 192.168.1.146`;
 - genera i profili client.
 
@@ -120,6 +117,8 @@ Nota: alcuni file dentro `data/conf` vengono creati dal container come `root`. L
 Se su `gram.isti.cnr.it` avevi gia' generato `data/conf/openvpn.conf` con la vecchia subnet `10.84.0.0/24`, `init.sh` non la sovrascrive automaticamente. Per passare davvero a `10.8.0.0/24`, rigenera la configurazione o aggiorna manualmente `data/conf/openvpn.conf` prima di avviare il container.
 
 Se il container esce con errori su IPv6 forwarding o `net.ipv4.ip_forward`, rilancia `./scripts/start.sh`: la configurazione Docker passa i sysctl necessari al container e lo ricrea con `--force-recreate`.
+
+Se il container esce con `--server already defines an ifconfig-pool`, rilancia prima `./scripts/init.sh`: lo script rimuove eventuali righe `ifconfig-pool` aggiunte in precedenza, perche' OpenVPN le considera incompatibili con la direttiva `server`.
 
 Profili generati:
 
